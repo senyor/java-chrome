@@ -1,0 +1,27 @@
+resources:
+- name: java-chrome-source
+  type: git
+  source: 
+    uri: https://github.com/emerald-squad/java-chrome.git
+    branch: 'master'
+
+- name: docker-hub
+  type: docker-image
+  source:
+    repository: emeraldsquad/java-chrome
+    username: ((docker-hub-username))
+    password: ((docker-hub-password))
+
+jobs:
+- name: publish
+  plan:
+  - aggregate:
+    - get: java-chrome-source
+      trigger: true
+  - task: get-version
+    file: java-chrome-source/ci/tasks/get-version.yml
+  - put: docker-hub
+    params:
+      build: java-chrome-source
+      tag: version/version
+      tag_as_latest: true
